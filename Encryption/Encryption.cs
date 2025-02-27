@@ -3,8 +3,35 @@ using System.Text;
 
 namespace Encryption
 {
-    class EncryptUtils
+    public static class EncryptUtils
     {
+        public static string CreateMasterPassword()
+        {
+            string? masterPassword;
+            bool equal;
+
+            do
+            {
+                Console.WriteLine(
+                    "Please enter a master password. This password will be used for encryption and CANNOT be changed."
+                );
+                masterPassword = Console.ReadLine();
+
+                Console.WriteLine("\nPlease enter your password again to confirm.");
+                string? reEntry = Console.ReadLine();
+
+                equal = masterPassword == reEntry;
+
+                if (!equal)
+                    Console.WriteLine("\nPasswords do not match.");
+            } while (!equal);
+
+            if (masterPassword == null)
+                throw new ArgumentNullException("Master password cannot be null");
+
+            return masterPassword;
+        }
+
         public static (byte[] salt, byte[] key) DeriveKeyFromMasterPassword(string masterPassword)
         {
             byte[] salt = GenerateSalt(32);
@@ -12,19 +39,19 @@ namespace Encryption
             using Rfc2898DeriveBytes pbkdf2 = new(
                 masterPassword,
                 salt,
-                100000, //iterations
+                100000,
                 HashAlgorithmName.SHA512
             );
 
-            return (salt, pbkdf2.GetBytes(32));
+            byte[] key = pbkdf2.GetBytes(32);
+
+            return (salt, key);
         }
 
-        private static byte[] GenerateSalt(int size)
-        {
-            return RandomNumberGenerator.GetBytes(size);
-        }
-
-        public static (byte[] encryptedData, byte[] iv) EncryptPassword(string password, byte[] key)
+        public static (byte[] encryptedPassword, byte[] iv) EncryptPassword(
+            string password,
+            byte[] key
+        )
         {
             byte[] iv = GenerateSalt(16);
             byte[] passwordInBytes = Encoding.UTF8.GetBytes(password);
@@ -43,9 +70,14 @@ namespace Encryption
             return (ms.ToArray(), iv);
         }
 
+        private static byte[] GenerateSalt(int size)
+        {
+            return RandomNumberGenerator.GetBytes(size);
+        }
+
         private static string RandomPasswordGenerator()
         {
-            return "a";
+            return default;
         }
     }
 }

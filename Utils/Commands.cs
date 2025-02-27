@@ -1,6 +1,6 @@
 namespace Utils
 {
-    class Commands
+    public static class Commands
     {
         public static void List() { }
 

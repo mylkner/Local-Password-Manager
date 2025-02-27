@@ -1,50 +1,45 @@
 using System.Data.SQLite;
+using Encryption;
 
 namespace SQLite
 {
-    class Db
+    public static class Db
     {
-        public static void SetMasterPassword(string masterPassword)
+        private static SQLiteConnection? ConnectToDb(byte[] key)
         {
-            string dummy = "DummyPassword123";
-            (byte[] salt, byte[] key) = Encryption.EncryptUtils.DeriveKeyFromMasterPassword(
-                masterPassword
+            return default;
+        }
+
+        public static bool CheckForDummyEntry()
+        {
+            return false;
+        }
+
+        public static void SetDummyEntry()
+        {
+            string masterPassword = EncryptUtils.CreateMasterPassword();
+            (byte[] salt, byte[] key) = EncryptUtils.DeriveKeyFromMasterPassword(masterPassword);
+            (byte[] encryptedPassword, byte[] iv) = EncryptUtils.EncryptPassword(
+                "DummyEntry123",
+                key
             );
-            (byte[] encryptedData, byte[] iv) = Encryption.EncryptUtils.EncryptPassword(dummy, key);
+
+            Store.KeyManager.SetKey(key);
 
             Console.WriteLine(
-                $"ED: {Convert.ToBase64String(encryptedData)}\nIV: {Convert.ToBase64String(iv)}\nSalt: {Convert.ToBase64String(salt)}"
+                $"ED: {Convert.ToBase64String(encryptedPassword)}\nIV: {Convert.ToBase64String(iv)}\nSalt: {Convert.ToBase64String(salt)}"
             );
             Console.WriteLine("Password Saved");
         }
 
-        private static SQLiteConnection? ConnectToDb(byte[] key)
-        {
-            try
-            {
-                string filePath = @"passwords.db";
-                string base64Key = Convert.ToBase64String(key);
-
-                SQLiteConnection connection = new($"Data source={filePath};Password={base64Key}");
-
-                Console.WriteLine("\nSuccessfully connected to db.");
-                return connection;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error connecting to database: {ex.Message}");
-                return null;
-            }
-        }
-
         private static bool AddEntry()
         {
-            return true;
+            return default;
         }
 
         private static bool DeleteEntry()
         {
-            return true;
+            return default;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace PasswordManager
 {
-    class Program
+    public static class Program
     {
         static void Main()
         {

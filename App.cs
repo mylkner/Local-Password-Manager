@@ -1,21 +1,19 @@
+using Encryption;
+using SQLite;
+
 namespace PasswordManager
 {
-    class App
+    public static class App
     {
-        private string _key = "";
-
         public static void Run()
         {
             Console.WriteLine("Welcome to your password manager.");
 
-            if (!Verification.MasterPassword.CheckIfExists())
+            if (!Db.CheckForDummyEntry())
             {
-                Verification.MasterPassword.Create();
+                Db.SetDummyEntry();
             }
-            else
-            {
-                Verification.MasterPassword.VerifyLogin();
-            }
+            else { }
         }
     }
 }

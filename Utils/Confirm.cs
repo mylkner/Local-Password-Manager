@@ -1,6 +1,6 @@
 namespace Utils
 {
-    class Confirm
+    public static class Confirm
     {
         public static bool ConfirmAction()
         {
