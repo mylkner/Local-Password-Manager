@@ -29,11 +29,13 @@ namespace Encryption
             if (masterPassword == null)
                 throw new ArgumentNullException("Master password cannot be null");
 
+            Console.WriteLine("\nPassword set.");
             return masterPassword;
         }
 
-        public static (byte[] salt, byte[] key) DeriveKeyFromMasterPassword(string masterPassword)
+        public static byte[] DeriveKeyFromMasterPassword(string masterPassword)
         {
+            Console.WriteLine("Creating key...");
             byte[] salt = GenerateSalt(32);
 
             using Rfc2898DeriveBytes pbkdf2 = new(
@@ -45,7 +47,7 @@ namespace Encryption
 
             byte[] key = pbkdf2.GetBytes(32);
 
-            return (salt, key);
+            return key;
         }
 
         public static (byte[] encryptedPassword, byte[] iv) EncryptPassword(
