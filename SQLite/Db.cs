@@ -12,19 +12,17 @@ namespace SQLite
             return File.Exists(_filePath);
         }
 
-        public static bool CreateConnection(string password)
+        public static void CreateConnection(string password)
         {
             try
             {
                 using SqliteConnection cnn = new($"Data Source={_filePath};Password={password}");
                 _connection = cnn;
                 cnn.Open();
-                return true;
             }
             catch
             {
                 Console.WriteLine("Database connection failed.");
-                return false;
             }
         }
 

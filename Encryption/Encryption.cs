@@ -33,7 +33,7 @@ namespace Encryption
             return masterPassword;
         }
 
-        public static byte[] DeriveKeyFromMasterPassword(string masterPassword)
+        public static void DeriveKeyFromMasterPassword(string masterPassword)
         {
             byte[] salt = GenerateSalt(32);
 
@@ -46,8 +46,6 @@ namespace Encryption
 
             byte[] key = pbkdf2.GetBytes(32);
             Store.KeyManager.SetKey(key);
-
-            return key;
         }
 
         public static (byte[] encryptedPassword, byte[] iv) EncryptPassword(
