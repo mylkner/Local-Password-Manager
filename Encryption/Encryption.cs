@@ -35,7 +35,6 @@ namespace Encryption
 
         public static byte[] DeriveKeyFromMasterPassword(string masterPassword)
         {
-            Console.WriteLine("Creating key...");
             byte[] salt = GenerateSalt(32);
 
             using Rfc2898DeriveBytes pbkdf2 = new(
@@ -46,6 +45,7 @@ namespace Encryption
             );
 
             byte[] key = pbkdf2.GetBytes(32);
+            Store.KeyManager.SetKey(key);
 
             return key;
         }
@@ -72,6 +72,11 @@ namespace Encryption
             return (ms.ToArray(), iv);
         }
 
+        public static string DecryptPassword(byte[] key, byte[] iv)
+        {
+            return "a";
+        }
+
         private static byte[] GenerateSalt(int size)
         {
             return RandomNumberGenerator.GetBytes(size);
@@ -79,7 +84,7 @@ namespace Encryption
 
         private static string RandomPasswordGenerator()
         {
-            return default;
+            return "a";
         }
     }
 }

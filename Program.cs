@@ -1,4 +1,5 @@
-﻿using Encryption;
+﻿using System.Reflection;
+using Encryption;
 using SQLite;
 
 namespace PasswordManager
@@ -9,17 +10,33 @@ namespace PasswordManager
         {
             {
                 Console.WriteLine("Welcome to your password manager.");
+                string? masterPassword;
 
                 if (!Db.CheckIfDbExists())
                 {
-                    string masterPassword = EncryptUtils.CreateMasterPassword();
-                    byte[] key = EncryptUtils.DeriveKeyFromMasterPassword(masterPassword);
-
-                    Store.KeyManager.SetKey(key);
-                    Db.CreateConnection(key, true);
+                    masterPassword = EncryptUtils.CreateMasterPassword();
+                    Console.WriteLine("\nAttempting database creation and connection...");
                 }
-                else { }
+                else
+                {
+                    Console.WriteLine("Please input your master password.");
+                    masterPassword =
+                        Console.ReadLine()
+                        ?? throw new ArgumentNullException("Input cannot be null.");
+                    Console.WriteLine("\nAttempting to connect to database...");
+                }
+
+                Initialise(masterPassword);
             }
+        }
+
+        private static void Initialise(string masterPassword)
+        {
+            Db.CreateConnection(masterPassword);
+            Console.WriteLine("Succesfully connected to database.");
+            Console.WriteLine("\nDeriving key from master password...");
+            EncryptUtils.DeriveKeyFromMasterPassword(masterPassword);
+            Console.WriteLine("Key derived.");
         }
     }
 }
