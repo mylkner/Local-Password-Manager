@@ -4,14 +4,14 @@ namespace Utils
     {
         public static bool ConfirmAction()
         {
-            string? choice;
+            string? choice = null;
 
             Console.WriteLine("\nAre you sure? y/n");
 
-            do
+            while (choice != "y" && choice != "n")
             {
                 choice = Console.ReadLine()?.ToLower();
-            } while (choice != "y" && choice != "n");
+            }
 
             return choice == "y";
         }
