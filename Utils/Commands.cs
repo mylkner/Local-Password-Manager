@@ -2,6 +2,8 @@ namespace Utils
 {
     public static class Commands
     {
+        public static void Help() { }
+
         public static void List() { }
 
         public static void Add() { }
