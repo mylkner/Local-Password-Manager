@@ -1,6 +1,5 @@
-﻿using System.Reflection;
-using Encryption;
-using SQLite;
+﻿using Encryption;
+using SQLiteDB;
 
 namespace PasswordManager
 {
@@ -8,35 +7,79 @@ namespace PasswordManager
     {
         static void Main()
         {
-            {
-                Console.WriteLine("Welcome to your password manager.");
-                string? masterPassword;
+            Console.WriteLine("Welcome to your password manager.");
 
-                if (!Db.CheckIfDbExists())
+            if (!Db.DbExists())
+            {
+                bool equal = false;
+
+                while (!equal)
                 {
-                    masterPassword = EncryptUtils.CreateMasterPassword();
-                    Console.WriteLine("\nAttempting database creation and connection...");
+                    Console.WriteLine(
+                        "Please enter a master password. This password will be used for encryption and CANNOT be changed."
+                    );
+
+                    string? masterPassword =
+                        Console.ReadLine()
+                        ?? throw new ArgumentNullException("Master password cannot be null");
+
+                    Console.WriteLine("\nPlease enter your password again to confirm.");
+                    string? reEntry = Console.ReadLine();
+
+                    equal = masterPassword == reEntry;
+
+                    if (!equal)
+                    {
+                        Console.WriteLine("\nPasswords do not match.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("\nPassword set.");
+                        Console.WriteLine("\nAttempting database creation and connection...");
+                        byte[]? salt = Db.OpenDb(masterPassword); //salt will be null here, OpenDb uses GetKeySalt to verify password for subsuquent logins
+                        Initialise(masterPassword, salt);
+                        break;
+                    }
                 }
-                else
+            }
+            else
+            {
+                byte[]? salt = null;
+
+                while (salt == null)
                 {
                     Console.WriteLine("Please input your master password.");
-                    masterPassword =
-                        Console.ReadLine()
-                        ?? throw new ArgumentNullException("Input cannot be null.");
-                    Console.WriteLine("\nAttempting to connect to database...");
-                }
 
-                Initialise(masterPassword);
+                    string masterPassword =
+                        Console.ReadLine()
+                        ?? throw new ArgumentNullException("Input cannot be empty.");
+
+                    Console.WriteLine("\nAttempting to connect to database...");
+
+                    salt = Db.OpenDb(masterPassword);
+
+                    if (salt == null)
+                    {
+                        Console.WriteLine("Failed to connect.");
+                    }
+                    else
+                    {
+                        Initialise(masterPassword, salt);
+                        break;
+                    }
+                }
             }
+
+            Console.WriteLine("Type `help` to see list of commands.");
+            Console.ReadLine();
         }
 
-        private static void Initialise(string masterPassword)
+        static void Initialise(string masterPassword, byte[]? salt)
         {
-            Db.CreateConnection(masterPassword);
-            Console.WriteLine("Succesfully connected to database.");
+            Console.WriteLine("Success!");
             Console.WriteLine("\nDeriving key from master password...");
-            EncryptUtils.DeriveKeyFromMasterPassword(masterPassword);
-            Console.WriteLine("Key derived.");
+            EncryptUtils.DeriveKeyFromMasterPassword(masterPassword, salt);
+            Console.WriteLine("Success!");
         }
     }
 }
