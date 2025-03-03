@@ -1,41 +1,18 @@
 using System.Security.Cryptography;
 using System.Text;
+using SQLiteDB;
 
 namespace Encryption
 {
     public static class EncryptUtils
     {
-        public static string CreateMasterPassword()
+        public static void DeriveKeyFromMasterPassword(string masterPassword, byte[]? salt)
         {
-            string? masterPassword;
-            bool equal;
-
-            do
+            if (salt == null)
             {
-                Console.WriteLine(
-                    "Please enter a master password. This password will be used for encryption and CANNOT be changed."
-                );
-                masterPassword = Console.ReadLine();
-
-                Console.WriteLine("\nPlease enter your password again to confirm.");
-                string? reEntry = Console.ReadLine();
-
-                equal = masterPassword == reEntry;
-
-                if (!equal)
-                    Console.WriteLine("\nPasswords do not match.");
-            } while (!equal);
-
-            if (masterPassword == null)
-                throw new ArgumentNullException("Master password cannot be null");
-
-            Console.WriteLine("\nPassword set.");
-            return masterPassword;
-        }
-
-        public static void DeriveKeyFromMasterPassword(string masterPassword)
-        {
-            byte[] salt = GenerateSalt(32);
+                salt = GenerateSalt(32);
+                Db.AddKeySalt(salt);
+            }
 
             using Rfc2898DeriveBytes pbkdf2 = new(
                 masterPassword,
@@ -44,8 +21,7 @@ namespace Encryption
                 HashAlgorithmName.SHA512
             );
 
-            byte[] key = pbkdf2.GetBytes(32);
-            Store.KeyManager.SetKey(key);
+            Store.KeyManager.SetKey(pbkdf2.GetBytes(32));
         }
 
         public static (byte[] encryptedPassword, byte[] iv) EncryptPassword(
