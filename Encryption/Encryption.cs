@@ -36,7 +36,6 @@ namespace Encryption
             using MemoryStream ms = new();
             using ICryptoTransform encryptor = aes.CreateEncryptor();
             using CryptoStream cs = new(ms, encryptor, CryptoStreamMode.Write);
-            using StreamReader sr = new(cs);
 
             cs.Write(passwordInBytes, 0, passwordInBytes.Length);
             cs.FlushFinalBlock();
