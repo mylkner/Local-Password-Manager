@@ -28,7 +28,7 @@ namespace Utils
             string? title =
                 Console.ReadLine() ?? throw new ArgumentNullException("Title cannot be null.");
 
-            Console.WriteLine("\nEnter a password");
+            Console.WriteLine("\nEnter a password:");
             string? pwd =
                 Console.ReadLine() ?? throw new ArgumentNullException("Password cannot be null.");
 
