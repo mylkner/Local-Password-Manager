@@ -39,6 +39,7 @@ namespace Encryption
             using MemoryStream ms = new();
             using ICryptoTransform encryptor = aes.CreateEncryptor();
             using CryptoStream cs = new(ms, encryptor, CryptoStreamMode.Write);
+            using StreamReader sr = new(cs);
 
             cs.Write(passwordInBytes, 0, passwordInBytes.Length);
             cs.FlushFinalBlock();
@@ -46,9 +47,18 @@ namespace Encryption
             return (ms.ToArray(), iv);
         }
 
-        public static string DecryptPassword(byte[] key, byte[] iv)
+        public static string DecryptPassword(byte[] encryptedPassword, byte[] iv)
         {
-            return "a";
+            using Aes aes = Aes.Create();
+            aes.Key = Store.KeyManager.GetKey();
+            aes.IV = iv;
+
+            using MemoryStream ms = new(encryptedPassword);
+            using ICryptoTransform decryptor = aes.CreateDecryptor();
+            using CryptoStream cs = new(ms, decryptor, CryptoStreamMode.Read);
+            using StreamReader sr = new(cs);
+
+            return sr.ReadToEnd();
         }
 
         private static byte[] GenerateSalt(int size)
