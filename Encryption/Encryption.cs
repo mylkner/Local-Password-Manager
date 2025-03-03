@@ -11,7 +11,7 @@ namespace Encryption
             if (salt == null)
             {
                 salt = GenerateSalt(32);
-                Db.AddKeySalt(salt);
+                Db.SetUpDbWithKeySalt(salt);
             }
 
             using Rfc2898DeriveBytes pbkdf2 = new(
