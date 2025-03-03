@@ -1,3 +1,7 @@
+using System.Runtime.InteropServices.Marshalling;
+using Encryption;
+using SQLiteDB;
+
 namespace Utils
 {
     public static class Commands
@@ -14,12 +18,26 @@ namespace Utils
 
         public static void List()
         {
-            Console.WriteLine("a");
+            Console.WriteLine("\nRetrieving entries...");
+            Db.GetEntries();
         }
 
         public static void Add()
         {
-            Console.WriteLine("a");
+            Console.WriteLine("\nInput a title to add:");
+            string? title =
+                Console.ReadLine() ?? throw new ArgumentNullException("Title cannot be null.");
+
+            Console.WriteLine("\nEnter a password");
+            string? pwd =
+                Console.ReadLine() ?? throw new ArgumentNullException("Password cannot be null.");
+
+            Console.WriteLine("\nEncrypting password...");
+            (byte[] encryptedPassword, byte[] iv) = EncryptUtils.EncryptPassword(pwd);
+            Console.WriteLine("Success!");
+            Console.WriteLine("\nAdding to database...");
+            Db.AddEntry(title, iv, encryptedPassword);
+            Console.WriteLine("Success!");
         }
 
         public static void Get()
