@@ -24,16 +24,13 @@ namespace Encryption
             Store.KeyManager.SetKey(pbkdf2.GetBytes(32));
         }
 
-        public static (byte[] encryptedPassword, byte[] iv) EncryptPassword(
-            string password,
-            byte[] key
-        )
+        public static (byte[] encryptedPassword, byte[] iv) EncryptPassword(string password)
         {
             byte[] iv = GenerateSalt(16);
             byte[] passwordInBytes = Encoding.UTF8.GetBytes(password);
 
             using Aes aes = Aes.Create();
-            aes.Key = key;
+            aes.Key = Store.KeyManager.GetKey();
             aes.IV = iv;
 
             using MemoryStream ms = new();
