@@ -1,39 +1,85 @@
 using Microsoft.Data.Sqlite;
 
-namespace SQLite
+namespace SQLiteDB
 {
     public static class Db
     {
         private static readonly string _filePath = "passwords.db";
-        private static SqliteConnection? _connection;
+        private static SqliteConnection? _conn;
 
-        public static bool CheckIfDbExists()
+        public static bool DbExists() => File.Exists(_filePath);
+
+        public static byte[]? OpenDb(string password)
         {
-            return File.Exists(_filePath);
+            using var conn = new SqliteConnection($"Data Source={_filePath};");
+            conn.Open();
+
+            using var addKeyCmd = conn.CreateCommand();
+            addKeyCmd.CommandText = $"PRAGMA key = `{password}`";
+            addKeyCmd.ExecuteNonQuery();
+
+            _conn = conn;
+            return GetKeySalt();
         }
 
-        public static void CreateConnection(string password)
+        public static void AddKeySalt(byte[] salt)
+        {
+            using SqliteCommand createCmd = GetConnection().CreateCommand();
+            createCmd.CommandText =
+                "CREATE TABLE IF NOT EXISTS key_salt (id INTEGER PRIMARY KEY CHECK (id = 1), salt BLOB NOT NULL)";
+            createCmd.ExecuteNonQuery();
+
+            using SqliteCommand insertCmd = GetConnection().CreateCommand();
+            insertCmd.CommandText = "INSERT INTO key_salt (id, salt) VALUES (1, @salt)";
+            insertCmd.Parameters.AddWithValue("@salt", salt);
+            insertCmd.ExecuteNonQuery();
+        }
+
+        public static void AddEntry(string title, string encryptedPassword, byte[] iv)
+        {
+            using SqliteCommand createCmd = GetConnection().CreateCommand();
+            createCmd.CommandText =
+                "CREATE TABLE IF NOT EXISTS passwords (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE, iv BLOB NOT NULLL, encryptedPassword BLOB NOT NULL)";
+            createCmd.ExecuteNonQuery();
+
+            using SqliteCommand insertCmd = GetConnection().CreateCommand();
+            insertCmd.CommandText =
+                "INSERT INTO key_salt (title, iv, password) VALUES (@title, @iv, @encryptedPassword)";
+            insertCmd.Parameters.AddWithValue("@title", title);
+            insertCmd.Parameters.AddWithValue("@iv", iv);
+            insertCmd.Parameters.AddWithValue("@encryptedPassword", encryptedPassword);
+            insertCmd.ExecuteNonQuery();
+        }
+
+        public static void DeleteEntry(string title)
+        {
+            using SqliteCommand deleteCmd = GetConnection().CreateCommand();
+            deleteCmd.CommandText = $"DELETE FROM passwords WHERE title = {title}";
+            deleteCmd.ExecuteNonQuery();
+        }
+
+        private static SqliteConnection GetConnection()
+        {
+            if (_conn == null)
+                throw new ArgumentNullException(null, "Connection cannot be null");
+            _conn.Open();
+            return _conn;
+        }
+
+        private static byte[]? GetKeySalt()
         {
             try
             {
-                using SqliteConnection cnn = new($"Data Source={_filePath};Password={password}");
-                _connection = cnn;
-                cnn.Open();
+                using SqliteCommand getCmd = GetConnection().CreateCommand();
+                getCmd.CommandText = "SELECT salt FROM key_salt WHERE id = 1";
+                object? result = getCmd.ExecuteScalar();
+
+                return (byte[]?)result;
             }
             catch
             {
-                Console.WriteLine("Database connection failed.");
+                return null;
             }
-        }
-
-        private static bool AddEntry()
-        {
-            return default;
-        }
-
-        private static bool DeleteEntry()
-        {
-            return default;
         }
     }
 }
