@@ -22,12 +22,17 @@ namespace SQLiteDB
             return GetKeySalt();
         }
 
-        public static void AddKeySalt(byte[] salt)
+        public static void SetUpDbWithKeySalt(byte[] salt)
         {
-            using SqliteCommand createCmd = GetConnection().CreateCommand();
-            createCmd.CommandText =
+            using SqliteCommand createPwdTabCmd = GetConnection().CreateCommand();
+            createPwdTabCmd.CommandText =
+                "CREATE TABLE IF NOT EXISTS passwords (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE, iv BLOB NOT NULL, encryptedPassword BLOB NOT NULL)";
+            createPwdTabCmd.ExecuteNonQuery();
+
+            using SqliteCommand createSaltTabCmd = GetConnection().CreateCommand();
+            createSaltTabCmd.CommandText =
                 "CREATE TABLE IF NOT EXISTS key_salt (id INTEGER PRIMARY KEY CHECK (id = 1), salt BLOB NOT NULL)";
-            createCmd.ExecuteNonQuery();
+            createSaltTabCmd.ExecuteNonQuery();
 
             using SqliteCommand insertCmd = GetConnection().CreateCommand();
             insertCmd.CommandText = "INSERT INTO key_salt (id, salt) VALUES (1, @salt)";
@@ -35,16 +40,30 @@ namespace SQLiteDB
             insertCmd.ExecuteNonQuery();
         }
 
-        public static void AddEntry(string title, string encryptedPassword, byte[] iv)
+        public static void GetEntries()
         {
-            using SqliteCommand createCmd = GetConnection().CreateCommand();
-            createCmd.CommandText =
-                "CREATE TABLE IF NOT EXISTS passwords (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL UNIQUE, iv BLOB NOT NULLL, encryptedPassword BLOB NOT NULL)";
-            createCmd.ExecuteNonQuery();
+            using SqliteCommand getCmd = GetConnection().CreateCommand();
+            getCmd.CommandText = "SELECT title FROM passwords";
+            SqliteDataReader reader = getCmd.ExecuteReader();
 
+            if (!reader.Read())
+            {
+                Console.WriteLine("No entries found.");
+                return;
+            }
+
+            while (reader.Read())
+            {
+                string title = reader.GetString(0);
+                Console.WriteLine(title);
+            }
+        }
+
+        public static void AddEntry(string title, byte[] iv, byte[] encryptedPassword)
+        {
             using SqliteCommand insertCmd = GetConnection().CreateCommand();
             insertCmd.CommandText =
-                "INSERT INTO key_salt (title, iv, password) VALUES (@title, @iv, @encryptedPassword)";
+                "INSERT INTO passwords (title, iv, password) VALUES (@title, @iv, @encryptedPassword)";
             insertCmd.Parameters.AddWithValue("@title", title);
             insertCmd.Parameters.AddWithValue("@iv", iv);
             insertCmd.Parameters.AddWithValue("@encryptedPassword", encryptedPassword);
