@@ -1,5 +1,6 @@
 ﻿using Encryption;
 using SQLiteDB;
+using Utils;
 
 namespace PasswordManager
 {
@@ -52,7 +53,7 @@ namespace PasswordManager
 
                     string masterPassword =
                         Console.ReadLine()
-                        ?? throw new ArgumentNullException("Input cannot be empty.");
+                        ?? throw new ArgumentNullException("Input cannot be null.");
 
                     Console.WriteLine("\nAttempting to connect to database...");
 
@@ -70,8 +71,37 @@ namespace PasswordManager
                 }
             }
 
-            Console.WriteLine("Type `help` to see list of commands.");
-            Console.ReadLine();
+            while (true)
+            {
+                Console.WriteLine("\nType `help` to see list of commands.");
+                string? option =
+                    Console.ReadLine() ?? throw new ArgumentNullException("Input cannot be null.");
+
+                switch (option.ToLower())
+                {
+                    case "help":
+                        Commands.Help();
+                        break;
+                    case "list":
+                        Commands.List();
+                        break;
+                    case "add":
+                        Commands.Add();
+                        break;
+                    case "get":
+                        Commands.Get();
+                        break;
+                    case "delete":
+                        Commands.Delete();
+                        break;
+                    case "exit":
+                        Commands.Exit();
+                        break;
+                    default:
+                        Console.WriteLine("Command not recognised.");
+                        break;
+                }
+            }
         }
 
         static void Initialise(string masterPassword, byte[]? salt)
