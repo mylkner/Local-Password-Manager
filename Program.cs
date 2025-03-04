@@ -118,6 +118,9 @@ namespace PasswordManager
                             Commands.Delete(title);
                         }
                         break;
+                    case "clear":
+                        Console.Clear();
+                        break;
                     case "exit":
                         Commands.Exit();
                         break;

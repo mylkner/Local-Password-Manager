@@ -13,6 +13,7 @@ namespace Utils
             Console.WriteLine("Get <title> - retrieves the password for <title>.");
             Console.WriteLine("Add - add an entry.");
             Console.WriteLine("Delete <title> - delete <title> from database.");
+            Console.WriteLine("Clear - clears the terminal.");
             Console.WriteLine("Exit - exit the programme.");
         }
 
