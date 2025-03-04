@@ -43,10 +43,10 @@ namespace SQLiteDB
         public static void GetEntries()
         {
             using SqliteCommand getCmd = GetConnection().CreateCommand();
-            getCmd.CommandText = "SELECT title FROM passwords";
+            getCmd.CommandText = "SELECT title, iv, encryptedPassword FROM passwords";
             SqliteDataReader reader = getCmd.ExecuteReader();
 
-            if (!reader.Read())
+            if (!reader.HasRows)
             {
                 Console.WriteLine("No entries found.");
                 return;
@@ -63,7 +63,7 @@ namespace SQLiteDB
         {
             using SqliteCommand insertCmd = GetConnection().CreateCommand();
             insertCmd.CommandText =
-                "INSERT INTO passwords (title, iv, password) VALUES (@title, @iv, @encryptedPassword)";
+                "INSERT INTO passwords (title, iv, encryptedPassword) VALUES (@title, @iv, @encryptedPassword)";
             insertCmd.Parameters.AddWithValue("@title", title);
             insertCmd.Parameters.AddWithValue("@iv", iv);
             insertCmd.Parameters.AddWithValue("@encryptedPassword", encryptedPassword);
