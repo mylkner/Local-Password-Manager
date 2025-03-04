@@ -22,7 +22,7 @@ namespace Utils
             Db.ListEntries();
         }
 
-        public static async void Get(string title)
+        public static void Get(string title)
         {
             Console.WriteLine($"\nGetting password for {title}...");
             var result = Db.GetEntry(title);
