@@ -45,15 +45,31 @@ namespace Utils
             string? title =
                 Console.ReadLine() ?? throw new ArgumentNullException("Title cannot be null.");
 
-            Console.WriteLine("\nEnter a password:");
-            string? pwd =
-                Console.ReadLine() ?? throw new ArgumentNullException("Password cannot be null.");
+            Console.WriteLine("\nSelect password creation method (input either 1 or 2):");
+            Console.WriteLine("1. Manual.");
+            Console.WriteLine("2. Automatic (generates password for you).");
+            string? choice = null;
+
+            while (choice != "1" || choice != "2")
+            {
+                choice = Console.ReadLine();
+            }
+            string? pwd;
+            if (choice == "1")
+            {
+                pwd =
+                    Console.ReadLine()
+                    ?? throw new ArgumentNullException("Password cannot be null.");
+            }
+            else
+            {
+                pwd = EncryptUtils.RandomPasswordGenerator();
+            }
 
             Console.WriteLine("\nEncrypting password...");
             (byte[] encryptedPassword, byte[] iv) = EncryptUtils.EncryptPassword(pwd);
             Console.WriteLine("Adding to database...");
             Db.AddEntry(title, iv, encryptedPassword);
-            Console.WriteLine("Entry added.");
         }
 
         public static void Delete(string title)
