@@ -24,5 +24,10 @@ namespace Store
             }
             return _key;
         }
+
+        public static void VoidKey()
+        {
+            _key = null;
+        }
     }
 }
