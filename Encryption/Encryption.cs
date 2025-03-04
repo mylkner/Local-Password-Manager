@@ -57,14 +57,32 @@ namespace Encryption
             return sr.ReadToEnd();
         }
 
-        private static byte[] GenerateSalt(int size)
+        public static string RandomPasswordGenerator()
         {
-            return RandomNumberGenerator.GetBytes(size);
+            string validChars =
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+";
+            Random rnd = new();
+            int length = rnd.Next(16, 21);
+            char[] password = new char[length];
+            byte[] randomBytes = new byte[length];
+
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomBytes);
+
+            for (int i = 0; i < length; i++)
+            {
+                password[i] = validChars[randomBytes[i] % validChars.Length];
+            }
+
+            return new string(password);
         }
 
-        private static string RandomPasswordGenerator()
+        private static byte[] GenerateSalt(int size)
         {
-            return "a";
+            byte[] salt = new byte[size];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(salt);
+            return salt;
         }
     }
 }

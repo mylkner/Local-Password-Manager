@@ -50,11 +50,13 @@ namespace Utils
             Console.WriteLine("2. Automatic (generates password for you).");
             string? choice = null;
 
-            while (choice != "1" || choice != "2")
+            while (choice != "1" && choice != "2")
             {
                 choice = Console.ReadLine();
             }
+
             string? pwd;
+
             if (choice == "1")
             {
                 pwd =
