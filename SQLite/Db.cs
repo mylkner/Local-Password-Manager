@@ -4,14 +4,20 @@ namespace SQLiteDB
 {
     public static class Db
     {
-        private static readonly string _filePath = "passwords.db";
+        private static readonly string _appDataPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "PasswordManager"
+        );
+        private static readonly string dbPath = Path.Combine(_appDataPath, "passwords.db");
         private static SqliteConnection? _conn;
 
-        public static bool DbExists() => File.Exists(_filePath);
+        public static bool DbExists() => File.Exists(dbPath);
 
         public static byte[]? OpenDb(string password)
         {
-            using var conn = new SqliteConnection($"Data Source={_filePath};");
+            if (!Directory.Exists(_appDataPath))
+                Directory.CreateDirectory(_appDataPath);
+            using var conn = new SqliteConnection($"Data Source={dbPath};");
             conn.Open();
 
             using var addKeyCmd = conn.CreateCommand();
