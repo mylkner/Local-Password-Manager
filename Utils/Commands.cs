@@ -68,13 +68,15 @@ namespace Utils
                 pwd =
                     Console.ReadLine()
                     ?? throw new ArgumentNullException("Password cannot be null.");
+                Console.Clear();
             }
             else
             {
+                Console.Clear();
                 Console.WriteLine("Generating password...");
                 pwd = EncryptUtils.RandomPasswordGenerator();
             }
-            Console.Clear();
+
             Console.WriteLine("\nEncrypting password...");
             (byte[] encryptedPassword, byte[] iv) = EncryptUtils.EncryptPassword(pwd);
             Console.WriteLine("Adding to database...");
