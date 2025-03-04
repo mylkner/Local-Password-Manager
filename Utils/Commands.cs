@@ -21,6 +21,11 @@ namespace Utils
             Db.GetEntries();
         }
 
+        public static void Get()
+        {
+            Console.WriteLine("a");
+        }
+
         public static void Add()
         {
             Console.WriteLine("\nInput a title to add:");
@@ -37,11 +42,6 @@ namespace Utils
             Console.WriteLine("\nAdding to database...");
             Db.AddEntry(title, iv, encryptedPassword);
             Console.WriteLine("Success!");
-        }
-
-        public static void Get()
-        {
-            Console.WriteLine("a");
         }
 
         public static void Delete()

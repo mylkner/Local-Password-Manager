@@ -85,11 +85,11 @@ namespace PasswordManager
                     case "list":
                         Commands.List();
                         break;
-                    case "add":
-                        Commands.Add();
-                        break;
                     case "get":
                         Commands.Get();
+                        break;
+                    case "add":
+                        Commands.Add();
                         break;
                     case "delete":
                         Commands.Delete();
