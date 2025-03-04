@@ -81,14 +81,9 @@ namespace SQLiteDB
 
         public static void AddEntry(string title, byte[] iv, byte[] encryptedPassword)
         {
-            using SqliteCommand checkCmd = GetConnection().CreateCommand();
-            checkCmd.CommandText = "SELECT title FROM passwords WHERE title = @title";
-            checkCmd.Parameters.AddWithValue("@title", title);
-            SqliteDataReader check = checkCmd.ExecuteReader();
-
-            if (check.HasRows)
+            if (CheckIfTitleExists(title))
             {
-                Console.WriteLine($"Entry with title: {title} already exists.");
+                Console.WriteLine($"\nEntry with title: {title} already exists.");
                 return;
             }
 
@@ -99,23 +94,28 @@ namespace SQLiteDB
             insertCmd.Parameters.AddWithValue("@iv", iv);
             insertCmd.Parameters.AddWithValue("@encryptedPassword", encryptedPassword);
             insertCmd.ExecuteNonQuery();
+
+            Console.WriteLine("Entry added.");
         }
 
         public static void DeleteEntry(string title)
         {
+            if (!CheckIfTitleExists(title))
+            {
+                Console.WriteLine("No entry for given title found.");
+                return;
+            }
+
+            if (!Utils.Confirm.ConfirmAction())
+                return;
+            ;
+
             using SqliteCommand deleteCmd = GetConnection().CreateCommand();
             deleteCmd.CommandText = "DELETE FROM passwords WHERE title = @title";
             deleteCmd.Parameters.AddWithValue("@title", title);
-            int deleted = deleteCmd.ExecuteNonQuery();
+            deleteCmd.ExecuteNonQuery();
 
-            if (deleted < 1)
-            {
-                Console.WriteLine("No entry for given title found.");
-            }
-            else
-            {
-                Console.WriteLine("Title deleted.");
-            }
+            Console.WriteLine("Entry deleted.");
         }
 
         private static SqliteConnection GetConnection()
@@ -140,6 +140,16 @@ namespace SQLiteDB
             {
                 return null;
             }
+        }
+
+        private static bool CheckIfTitleExists(string title)
+        {
+            using SqliteCommand checkCmd = GetConnection().CreateCommand();
+            checkCmd.CommandText = "SELECT title FROM passwords WHERE title = @title";
+            checkCmd.Parameters.AddWithValue("@title", title);
+            SqliteDataReader check = checkCmd.ExecuteReader();
+
+            return check.HasRows;
         }
     }
 }
