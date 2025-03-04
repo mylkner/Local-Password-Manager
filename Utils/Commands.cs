@@ -8,7 +8,7 @@ namespace Utils
     {
         public static void Help()
         {
-            Console.WriteLine("\nCommands are not case sensitive.");
+            Console.WriteLine("\nCommands are not case sensitive, titles are.");
             Console.WriteLine("List - lists all entries.");
             Console.WriteLine("Get <title> - retrieves the password for <title>.");
             Console.WriteLine("Add - add an entry.");
@@ -83,7 +83,6 @@ namespace Utils
 
         public static void Delete(string title)
         {
-            Console.WriteLine($"\nDeleting {title}...");
             Db.DeleteEntry(title);
         }
 

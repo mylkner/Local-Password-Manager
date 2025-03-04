@@ -115,6 +115,7 @@ namespace SQLiteDB
             if (!Utils.Confirm.ConfirmAction())
                 return;
             ;
+            Console.WriteLine($"\nDeleting {title}...");
 
             using SqliteCommand deleteCmd = GetConnection().CreateCommand();
             deleteCmd.CommandText = "DELETE FROM passwords WHERE title = @title";
