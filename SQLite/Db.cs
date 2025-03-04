@@ -43,7 +43,7 @@ namespace SQLiteDB
         public static void ListEntries()
         {
             using SqliteCommand listCmd = GetConnection().CreateCommand();
-            listCmd.CommandText = "SELECT title, iv, encryptedPassword FROM passwords";
+            listCmd.CommandText = "SELECT title FROM passwords ORDER BY title ASC";
             SqliteDataReader reader = listCmd.ExecuteReader();
 
             if (!reader.HasRows)
