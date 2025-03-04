@@ -42,8 +42,6 @@ namespace Utils
             Console.WriteLine(
                 $"Password copied to clipboard. Make sure to clear clipboard history after use. (if enabled)"
             );
-            await Task.Delay(10000);
-            ClipboardService.SetText("");
         }
 
         public static void Add()
