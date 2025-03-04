@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices.Marshalling;
 using Encryption;
 using SQLiteDB;
 
@@ -52,6 +51,7 @@ namespace Utils
 
         public static void Exit()
         {
+            Store.KeyManager.VoidKey();
             Console.WriteLine("Exiting...");
             Environment.Exit(0);
         }
