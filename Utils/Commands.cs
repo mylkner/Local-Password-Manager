@@ -52,7 +52,7 @@ namespace Utils
 
             Console.WriteLine("\nSelect password creation method (input either 1 or 2):");
             Console.WriteLine("1. Manual.");
-            Console.WriteLine("2. Automatic (generates password for you).");
+            Console.WriteLine("2. Automatic.");
             string? choice = null;
 
             while (choice != "1" && choice != "2")
@@ -64,15 +64,17 @@ namespace Utils
 
             if (choice == "1")
             {
+                Console.WriteLine("\nPlease enter a password.");
                 pwd =
                     Console.ReadLine()
                     ?? throw new ArgumentNullException("Password cannot be null.");
             }
             else
             {
+                Console.WriteLine("Generating password...");
                 pwd = EncryptUtils.RandomPasswordGenerator();
             }
-
+            Console.Clear();
             Console.WriteLine("\nEncrypting password...");
             (byte[] encryptedPassword, byte[] iv) = EncryptUtils.EncryptPassword(pwd);
             Console.WriteLine("Adding to database...");

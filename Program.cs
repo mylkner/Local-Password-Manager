@@ -36,6 +36,7 @@ namespace PasswordManager
                     else
                     {
                         Console.WriteLine("\nPassword set.");
+                        Console.Clear();
                         Console.WriteLine("Attempting database creation and connection...");
                         byte[]? salt = Db.OpenDb(masterPassword); //salt will be null here, OpenDb uses GetKeySalt to verify password for subsuquent logins
                         Initialise(masterPassword, salt);
@@ -54,7 +55,7 @@ namespace PasswordManager
                     string masterPassword =
                         Console.ReadLine()
                         ?? throw new ArgumentNullException("Input cannot be null.");
-
+                    Console.Clear();
                     Console.WriteLine("\nAttempting to connect to database...");
 
                     salt = Db.OpenDb(masterPassword);
