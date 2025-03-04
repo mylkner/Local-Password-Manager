@@ -46,9 +46,16 @@ namespace Utils
 
         public static void Add()
         {
-            Console.WriteLine("\nInput a title to add:");
+            Console.WriteLine("\nInput a title to add (without spaces):");
             string? title =
                 Console.ReadLine() ?? throw new ArgumentNullException("Title cannot be null.");
+
+            while (title.Contains(' '))
+            {
+                Console.WriteLine("\nNo spaces.");
+                title =
+                    Console.ReadLine() ?? throw new ArgumentNullException("Title cannot be null.");
+            }
 
             Console.WriteLine("\nSelect password creation method (input either 1 or 2):");
             Console.WriteLine("1. Manual.");
