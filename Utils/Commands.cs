@@ -1,5 +1,6 @@
 using Encryption;
 using SQLiteDB;
+using TextCopy;
 
 namespace Utils
 {
@@ -21,7 +22,7 @@ namespace Utils
             Db.ListEntries();
         }
 
-        public static void Get(string title)
+        public static async void Get(string title)
         {
             Console.WriteLine($"\nGetting password for {title}...");
             var result = Db.GetEntry(title);
@@ -36,7 +37,13 @@ namespace Utils
             byte[] encryptedPassword = result.Value.encryptedPassword;
             Console.WriteLine("Decrypting password...");
             string decryptedPassword = EncryptUtils.DecryptPassword(iv, encryptedPassword);
-            Console.WriteLine($"Your password is {decryptedPassword}");
+
+            ClipboardService.SetText(decryptedPassword);
+            Console.WriteLine(
+                $"Password copied to clipboard. Make sure to clear clipboard history after use. (if enabled)"
+            );
+            await Task.Delay(10000);
+            ClipboardService.SetText("");
         }
 
         public static void Add()
