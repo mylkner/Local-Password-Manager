@@ -77,7 +77,7 @@ namespace Utils
                 pwd = EncryptUtils.RandomPasswordGenerator();
             }
 
-            Console.WriteLine("\nEncrypting password...");
+            Console.WriteLine("Encrypting password...");
             (byte[] encryptedPassword, byte[] iv) = EncryptUtils.EncryptPassword(pwd);
             Console.WriteLine("Adding to database...");
             Db.AddEntry(title, iv, encryptedPassword);
