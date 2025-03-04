@@ -36,7 +36,7 @@ namespace PasswordManager
                     else
                     {
                         Console.WriteLine("\nPassword set.");
-                        Console.WriteLine("\nAttempting database creation and connection...");
+                        Console.WriteLine("Attempting database creation and connection...");
                         byte[]? salt = Db.OpenDb(masterPassword); //salt will be null here, OpenDb uses GetKeySalt to verify password for subsuquent logins
                         Initialise(masterPassword, salt);
                         break;
@@ -76,8 +76,9 @@ namespace PasswordManager
                 Console.WriteLine("\nType `help` to see list of commands.");
                 string? option =
                     Console.ReadLine() ?? throw new ArgumentNullException("Input cannot be null.");
+                string[] commandParts = option.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-                switch (option.ToLower())
+                switch (commandParts[0].ToLower())
                 {
                     case "help":
                         Commands.Help();
@@ -86,13 +87,35 @@ namespace PasswordManager
                         Commands.List();
                         break;
                     case "get":
-                        Commands.Get();
+                        if (commandParts.Length > 1)
+                        {
+                            Commands.Get(commandParts[1]);
+                        }
+                        else
+                        {
+                            Console.WriteLine("\nPlease provide the title you want to get.");
+                            string? title =
+                                Console.ReadLine()
+                                ?? throw new ArgumentNullException("Title cannot be null.");
+                            Commands.Get(title);
+                        }
                         break;
                     case "add":
                         Commands.Add();
                         break;
                     case "delete":
-                        Commands.Delete();
+                        if (commandParts.Length > 1)
+                        {
+                            Commands.Delete(commandParts[1]);
+                        }
+                        else
+                        {
+                            Console.WriteLine("\nPlease provide the title you want to delete.");
+                            string? title =
+                                Console.ReadLine()
+                                ?? throw new ArgumentNullException("Title cannot be null.");
+                            Commands.Delete(title);
+                        }
                         break;
                     case "exit":
                         Commands.Exit();
@@ -106,10 +129,9 @@ namespace PasswordManager
 
         static void Initialise(string masterPassword, byte[]? salt)
         {
-            Console.WriteLine("Success!");
-            Console.WriteLine("\nDeriving key from master password...");
+            Console.WriteLine("Deriving key from master password...");
             EncryptUtils.DeriveKeyFromMasterPassword(masterPassword, salt);
-            Console.WriteLine("Success!");
+            Console.WriteLine("Connected.");
         }
     }
 }

@@ -9,21 +9,34 @@ namespace Utils
         {
             Console.WriteLine("\nCommands are not case sensitive.");
             Console.WriteLine("List - lists all entries.");
+            Console.WriteLine("Get <title> - retrieves the password for <title>.");
             Console.WriteLine("Add - add an entry.");
-            Console.WriteLine("Get x - retrieves a password for x, where x is the title.");
-            Console.WriteLine("Delete x - delete an entry where x is the title of the entry.");
+            Console.WriteLine("Delete <title> - delete <title> from database.");
             Console.WriteLine("Exit - exit the programme.");
         }
 
         public static void List()
         {
             Console.WriteLine("\nRetrieving entries...");
-            Db.GetEntries();
+            Db.ListEntries();
         }
 
-        public static void Get()
+        public static void Get(string title)
         {
-            Console.WriteLine("a");
+            Console.WriteLine($"\nGetting password for {title}...");
+            var result = Db.GetEntry(title);
+
+            if (result == null)
+            {
+                Console.WriteLine("No entry found for given title.");
+                return;
+            }
+
+            byte[] iv = result.Value.iv;
+            byte[] encryptedPassword = result.Value.encryptedPassword;
+            Console.WriteLine("Decrypting password...");
+            string decryptedPassword = EncryptUtils.DecryptPassword(iv, encryptedPassword);
+            Console.WriteLine($"Your password is {decryptedPassword}");
         }
 
         public static void Add()
@@ -38,15 +51,15 @@ namespace Utils
 
             Console.WriteLine("\nEncrypting password...");
             (byte[] encryptedPassword, byte[] iv) = EncryptUtils.EncryptPassword(pwd);
-            Console.WriteLine("Success!");
-            Console.WriteLine("\nAdding to database...");
+            Console.WriteLine("Adding to database...");
             Db.AddEntry(title, iv, encryptedPassword);
-            Console.WriteLine("Success!");
+            Console.WriteLine("Entry added.");
         }
 
-        public static void Delete()
+        public static void Delete(string title)
         {
-            Console.WriteLine("a");
+            Console.WriteLine($"\nDeleting {title}...");
+            Db.DeleteEntry(title);
         }
 
         public static void Exit()

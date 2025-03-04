@@ -43,7 +43,7 @@ namespace Encryption
             return (ms.ToArray(), iv);
         }
 
-        public static string DecryptPassword(byte[] encryptedPassword, byte[] iv)
+        public static string DecryptPassword(byte[] iv, byte[] encryptedPassword)
         {
             using Aes aes = Aes.Create();
             aes.Key = Store.KeyManager.GetKey();

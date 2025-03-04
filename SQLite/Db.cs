@@ -40,11 +40,11 @@ namespace SQLiteDB
             insertCmd.ExecuteNonQuery();
         }
 
-        public static void GetEntries()
+        public static void ListEntries()
         {
-            using SqliteCommand getCmd = GetConnection().CreateCommand();
-            getCmd.CommandText = "SELECT title, iv, encryptedPassword FROM passwords";
-            SqliteDataReader reader = getCmd.ExecuteReader();
+            using SqliteCommand listCmd = GetConnection().CreateCommand();
+            listCmd.CommandText = "SELECT title, iv, encryptedPassword FROM passwords";
+            SqliteDataReader reader = listCmd.ExecuteReader();
 
             if (!reader.HasRows)
             {
@@ -52,15 +52,46 @@ namespace SQLiteDB
                 return;
             }
 
+            int count = 1;
+
             while (reader.Read())
             {
                 string title = reader.GetString(0);
-                Console.WriteLine(title);
+                Console.WriteLine($"{count}. {title}");
+                count++;
             }
+        }
+
+        public static (byte[] iv, byte[] encryptedPassword)? GetEntry(string title)
+        {
+            using SqliteCommand getCmd = GetConnection().CreateCommand();
+            getCmd.CommandText = "SELECT iv, encryptedPassword FROM passwords WHERE title = @title";
+            getCmd.Parameters.AddWithValue("@title", title);
+            SqliteDataReader reader = getCmd.ExecuteReader();
+
+            if (reader.Read())
+            {
+                byte[] iv = (byte[])reader["iv"];
+                byte[] encryptedPassword = (byte[])reader["encryptedPassword"];
+
+                return (iv, encryptedPassword);
+            }
+            return null;
         }
 
         public static void AddEntry(string title, byte[] iv, byte[] encryptedPassword)
         {
+            using SqliteCommand checkCmd = GetConnection().CreateCommand();
+            checkCmd.CommandText = "SELECT title FROM passwords WHERE title = @title";
+            checkCmd.Parameters.AddWithValue("@title", title);
+            SqliteDataReader check = checkCmd.ExecuteReader();
+
+            if (check.HasRows)
+            {
+                Console.WriteLine($"Entry with title: {title} already exists.");
+                return;
+            }
+
             using SqliteCommand insertCmd = GetConnection().CreateCommand();
             insertCmd.CommandText =
                 "INSERT INTO passwords (title, iv, encryptedPassword) VALUES (@title, @iv, @encryptedPassword)";
@@ -73,8 +104,18 @@ namespace SQLiteDB
         public static void DeleteEntry(string title)
         {
             using SqliteCommand deleteCmd = GetConnection().CreateCommand();
-            deleteCmd.CommandText = $"DELETE FROM passwords WHERE title = {title}";
-            deleteCmd.ExecuteNonQuery();
+            deleteCmd.CommandText = "DELETE FROM passwords WHERE title = @title";
+            deleteCmd.Parameters.AddWithValue("@title", title);
+            int deleted = deleteCmd.ExecuteNonQuery();
+
+            if (deleted < 1)
+            {
+                Console.WriteLine("No entry for given title found.");
+            }
+            else
+            {
+                Console.WriteLine("Title deleted.");
+            }
         }
 
         private static SqliteConnection GetConnection()
